@@ -1,5 +1,0 @@
-INSERT INTO sls_sql_final (Student_id, Product_id, Status)
-VALUES
-    (usr, prod, "Utlaant");
-
-    
