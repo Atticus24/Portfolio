@@ -1,0 +1,16 @@
+<!-- {% block title %}User{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %} -->
+
+<h3>Student: {{User}} <h3/>
+    <form method="post" action="/">
+        <input type="submit" value="Låne" name="Låne"/>
+        <input type="submit" value="Levere" name="Levere"/>
+        <input type="submit" value="Se lån" name="Se lån"/>
+    </form>
