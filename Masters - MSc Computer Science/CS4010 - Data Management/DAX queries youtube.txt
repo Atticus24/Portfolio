@@ -1,0 +1,49 @@
+// DailyViewIncrease: Calculates the percentage increase in total views since the last recorded date. 
+DailyViewIncrease = 
+VAR CurrentDayViews = 
+    SUM('youtube'[viewCount])  //Current day's cumulative views for each video
+
+VAR FindPreviousDay =
+    CALCULATE(
+        MAX('youtube'[dateTimeAccessed]),  //Find the most recent valid date before the current date
+        FILTER(
+            ALL('youtube'),  // Ignore row context to find previous valid dates
+            'youtube'[dateTimeAccessed] < MAX('youtube'[dateTimeAccessed])  // Previous dates only
+            && NOT(ISBLANK('youtube'[viewCount]))  // Ensure there's valid view data
+            && 'youtube'[id] = MAX('youtube'[id])  // Match the same video ID
+        )
+    )
+
+VAR PreviousDayViews =
+    CALCULATE(
+        SUM('youtube'[viewCount]),  // Get the cumulative views for the most recent valid previous day
+        FILTER(
+            ALL('youtube'),
+            'youtube'[dateTimeAccessed] = FindPreviousDay  // Match the previous day
+            && 'youtube'[id] = MAX('youtube'[id])  // Match the same video ID
+        )
+    )
+
+RETURN
+    IF(
+        ISBLANK(CurrentDayViews) || ISBLANK(PreviousDayViews),  // Skip if data is missing
+        BLANK(),
+        (CurrentDayViews - PreviousDayViews)/(PreviousDayViews)  
+        //Calculate the view increase
+    )
+
+
+//VideoLengtFormatted: Merges durationHours, durationMinutes and durationSeconds into atomic hh:mm:ss value
+VideoLengthFormatted = 
+FORMAT('youtube'[durationHours], "00") & ":" &  
+FORMAT('youtube'[durationMinutes], "00") & ":" & 
+FORMAT('youtube'[durationSeconds], "00")
+
+
+//VideoLengthInSeconds: Converts and combines durationHours, durationMinutes and durationSeconds into atomic value in seconds
+VideoLengthInSeconds = 
+(
+    youtube[durationHours] * 3600 +
+    youtube[durationMinutes] * 60 +
+    youtube[durationSeconds] 
+)
